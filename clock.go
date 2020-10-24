@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/gotk3/gotk3/gtk"
+
+	htgotts "github.com/hegedustibor/htgo-tts"
 )
 
 type item struct {
@@ -41,6 +43,8 @@ func onTimeEdited(cell *gtk.CellRendererText, pathString string, text string) {
 func onMessageEdited(cell *gtk.CellRendererText, pathString string, text string) {
 	it, _ := store.GetIterFromString(pathString)
 	store.SetValue(it, 3, text)
+	speech := htgotts.Speech{Folder: "audio", Language: "en"}
+	speech.Speak(text)
 }
 
 func main() {

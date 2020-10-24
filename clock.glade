@@ -13,23 +13,15 @@
       <!-- column-name Message -->
       <column type="gchararray"/>
     </columns>
-    <data>
-      <row>
-        <col id="0">0</col>
-        <col id="1">True</col>
-        <col id="2" translatable="yes">21:30:00</col>
-        <col id="3" translatable="yes">Время поменять надпись</col>
-      </row>
-    </data>
   </object>
   <object class="GtkWindow" id="main">
     <property name="can_focus">False</property>
-    <property name="default_width">350</property>
+    <property name="default_width">400</property>
     <property name="default_height">250</property>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can_focus">True</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkScrolledWindow">
@@ -43,7 +35,7 @@
                 <property name="model">liststore</property>
                 <property name="search_column">2</property>
                 <child internal-child="selection">
-                  <object class="GtkTreeSelection"/>
+                  <object class="GtkTreeSelection" id="selection"/>
                 </child>
                 <child>
                   <object class="GtkTreeViewColumn">
@@ -53,8 +45,8 @@
                     <property name="sort_indicator">True</property>
                     <property name="sort_column_id">0</property>
                     <child>
-                      <object class="GtkCellRendererToggle" id="Enable">
-                        <signal name="toggled" handler="toggle" swapped="no"/>
+                      <object class="GtkCellRendererToggle" id="enable">
+                        <signal name="toggled" handler="on_enable_toggled" swapped="no"/>
                       </object>
                       <attributes>
                         <attribute name="active">1</attribute>
@@ -72,6 +64,7 @@
                     <child>
                       <object class="GtkCellRendererText" id="time">
                         <property name="editable">True</property>
+                        <signal name="edited" handler="on_time_edited" swapped="no"/>
                       </object>
                       <attributes>
                         <attribute name="text">2</attribute>
@@ -88,8 +81,9 @@
                     <property name="sort_indicator">True</property>
                     <property name="sort_column_id">2</property>
                     <child>
-                      <object class="GtkCellRendererText" id="Message">
+                      <object class="GtkCellRendererText" id="message">
                         <property name="editable">True</property>
+                        <signal name="edited" handler="on_message_edited" swapped="no"/>
                       </object>
                       <attributes>
                         <attribute name="text">3</attribute>
@@ -107,18 +101,44 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="add">
-            <property name="label">Add</property>
-            <property name="name">add</property>
+          <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
+            <property name="can_focus">False</property>
             <property name="halign">center</property>
+            <property name="spacing">10</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <object class="GtkButton" id="add">
+                <property name="label" translatable="yes">Add</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="remove">
+                <property name="label" translatable="yes">Remove</property>
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="padding">1</property>
+            <property name="fill">False</property>
+            <property name="padding">2</property>
             <property name="pack_type">end</property>
             <property name="position">2</property>
           </packing>
@@ -126,21 +146,26 @@
       </object>
     </child>
     <child type="titlebar">
-      <placeholder/>
-    </child>
-  </object>
-  <object class="GtkPopoverMenu" id="popUp">
-    <property name="can_focus">False</property>
-    <child>
-      <object class="GtkButton">
-        <property name="label" translatable="yes">Delete</property>
+      <object class="GtkHeaderBar">
         <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="receives_default">True</property>
+        <property name="can_focus">False</property>
+        <property name="title" translatable="yes">El Co Clock</property>
+        <property name="subtitle" translatable="yes">Talking Alarm</property>
+        <property name="show_close_button">True</property>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Settings</property>
+            <property name="visible">True</property>
+            <property name="sensitive">False</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+          </object>
+          <packing>
+            <property name="pack_type">end</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
       </object>
-      <packing>
-        <property name="submenu">main</property>
-      </packing>
     </child>
   </object>
 </interface>

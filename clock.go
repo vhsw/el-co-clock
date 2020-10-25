@@ -1,6 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/gotk3/gotk3/gtk"
@@ -12,6 +16,33 @@ var (
 	selectedPath *gtk.TreePath
 	timeFormat   = "15:04:05"
 )
+
+func loadConfig() {
+	file, err := os.Open("settings.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		disabled := strings.HasPrefix(line, "#")
+		if disabled {
+			line = strings.TrimPrefix(line, "#")
+		}
+		line = strings.TrimSpace(line)
+		split := strings.SplitN(line, ": ", 2)
+		store.Set(store.Append(),
+			[]int{0, 1, 2, 3},
+			[]interface{}{0, !disabled, split[0], split[1]})
+
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+}
 
 func speak(text string) {
 	speech := tts.Speech{Folder: "audio", Language: "ru"}
@@ -101,6 +132,7 @@ func main() {
 	win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
+	go loadConfig()
 	win.ShowAll()
 	go update()
 	gtk.Main()

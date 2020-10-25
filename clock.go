@@ -1,31 +1,40 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"time"
 
 	"github.com/gotk3/gotk3/gtk"
-
-	htgotts "github.com/hegedustibor/htgo-tts"
+	tts "github.com/hegedustibor/htgo-tts"
 )
 
-type item struct {
-	id      *gtk.TreeIter
-	time    string
-	message string
+var (
+	store        *gtk.ListStore
+	selectedPath *gtk.TreePath
+	timeFormat   = "15:04:05"
+)
+
+func speak(text string) {
+	speech := tts.Speech{Folder: "audio", Language: "ru"}
+	speech.Speak(text)
 }
 
 func update() {
 	for {
 		time.Sleep(1 * time.Second)
-		fmt.Println(store.IterNChildren(nil))
+		store.ForEach(func(model *gtk.TreeModel, path *gtk.TreePath, iter *gtk.TreeIter, userData ...interface{}) bool {
+			timeVal, _ := store.GetValue(iter, 2)
+			gTimeVal, _ := timeVal.GoValue()
+			timeSting := gTimeVal.(string)
+			if time.Now().Format(timeFormat) == timeSting {
+				msgVal, _ := store.GetValue(iter, 3)
+				gMsgVal, _ := msgVal.GoValue()
+				go func() { speak("Beep-bop. " + timeSting); speak(gMsgVal.(string)) }()
+				return true
+			}
+			return false
+		})
 	}
 }
-
-var (
-	store *gtk.ListStore
-)
 
 func onEnableToggled(cell *gtk.CellRendererToggle, pathString string) {
 	it, _ := store.GetIterFromString(pathString)
@@ -36,15 +45,21 @@ func onEnableToggled(cell *gtk.CellRendererToggle, pathString string) {
 }
 
 func onTimeEdited(cell *gtk.CellRendererText, pathString string, text string) {
+	_, err := time.Parse("15:04:05", text)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
 	it, _ := store.GetIterFromString(pathString)
 	store.SetValue(it, 2, text)
+
 }
 
 func onMessageEdited(cell *gtk.CellRendererText, pathString string, text string) {
 	it, _ := store.GetIterFromString(pathString)
 	store.SetValue(it, 3, text)
-	speech := htgotts.Speech{Folder: "audio", Language: "en"}
-	speech.Speak(text)
+	go speak(text)
 }
 
 func main() {
@@ -62,25 +77,18 @@ func main() {
 	addButton := addObj.(*gtk.Button)
 	addButton.Connect("clicked", func() {
 		it := store.Append()
-		store.Set(it, []int{0, 1, 2, 3}, []interface{}{1, true, "", ""})
+		now := time.Now()
+		store.Set(it, []int{0, 1, 2, 3}, []interface{}{1, true, now.Format(timeFormat), "Enter message..."})
 	})
 	removeObj, _ := builder.GetObject("remove")
 	removeButton := removeObj.(*gtk.Button)
 	selectObj, _ := builder.GetObject("selection")
 	selection := selectObj.(*gtk.TreeSelection)
-	var selectedPath *gtk.TreePath
 	selection.Connect("changed", func() {
-		var iter *gtk.TreeIter
-		var model gtk.ITreeModel
-		var ok bool
-		model, iter, ok = selection.GetSelected()
+		model, iter, ok := selection.GetSelected()
 		if ok {
 			removeButton.SetSensitive(true)
-			path, err := model.(*gtk.TreeModel).GetPath(iter)
-			if err != nil {
-				log.Printf("treeSelectionChangedCB: Could not get path from model: %s\n", err)
-				return
-			}
+			path, _ := model.(*gtk.TreeModel).GetPath(iter)
 			selectedPath = path
 		}
 	})

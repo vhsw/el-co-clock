@@ -1,3 +1,5 @@
+github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
+github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/gotk3/gotk3 v0.5.0 h1:GOkq4cFgAfeK6YAukLi64bz8zPayZKeCSSRr4mcFReQ=
 github.com/gotk3/gotk3 v0.5.0/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
 github.com/hegedustibor/htgo-tts v0.0.0-20201020054059-2b0b3a7cc05a h1:+eKoXgID66ADqttZxaCqvV92AK1DRwpGb4Igr6/Sqko=
